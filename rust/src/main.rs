@@ -6,7 +6,9 @@ use mongodb::{
 
 use std::thread;
 use std::time::{Instant};
-use std::env;
+//use std::env;
+
+const BATCH_SIZE:u32 = 1000;
 
 fn main() {
     let uri = "mongodb://localhost:27017";
@@ -65,13 +67,13 @@ fn main() {
 
     let start = Instant::now();
 
-    let args: Vec<String> = env::args().collect();
-    let batch_size:u32 = args[1].parse().unwrap();
+    //let args: Vec<String> = env::args().collect();
+    //let batch_size:u32 = args[1].parse().unwrap();
 
     // Query the documents in the collection with a filter and an option.
     let filter = doc! { "author": "George Orwell" };
     let find_options = FindOptions::builder()
-        .batch_size(batch_size)
+        .batch_size(BATCH_SIZE)
         .build();
     let cursor = collection.find(filter, find_options).unwrap();
 

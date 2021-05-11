@@ -57,6 +57,9 @@ func main() {
 		if err = cursor.Decode(&document); err != nil {
 			log.Fatal(err)
 		}
+
+		var _ = document["title"]
+		var _ = document["author"]
 	}
 
 	elapsed = time.Since(start)
