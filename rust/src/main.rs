@@ -9,19 +9,18 @@ use std::time::{Instant};
 //use std::env;
 
 const BATCH_SIZE:u32 = 1000;
+const DB_NAME:&str = "test";
+const COLLECTION_NAME:&str = "rust";
 
 fn main() {
     let uri = "mongodb://localhost:27017";
     println!("Connecting to Mongo DB: {}", uri);
 
-    // Clean BD
-    Client::with_uri_str(uri).unwrap().database("test").collection("pollo").drop(None).unwrap();
-
     let start = Instant::now();
 
     let client = Client::with_uri_str(uri).unwrap();
-    let database = client.database("test");
-    let collection = database.collection("pollo");
+    let database = client.database(DB_NAME);
+    let collection = database.collection(COLLECTION_NAME);
 
     collection.drop(None).unwrap();
 
@@ -30,17 +29,17 @@ fn main() {
 
         threads.push(thread::spawn(move || {
             let client = Client::with_uri_str(uri).unwrap();
-            let database = client.database("test");
-            let collection = database.collection("pollo");
+            let database = client.database(DB_NAME);
+            let collection = database.collection(COLLECTION_NAME);
 
             let mut docs = vec![
-                doc! { "title": "1984", "author": "George Orwell" },
+                doc! { "title": "Dune", "author": "Frank Herbert" },
             ];
 
             for _ in 0..33 {
-                docs.push(doc! { "title": "1984", "author": "George Orwell" });
-                docs.push(doc! { "title": "Animal Farm", "author": "George Orwell" });
-                docs.push(doc! { "title": "The Great Gatsby", "author": "F. Scott Fitzgerald" });
+                docs.push(doc! { "title": "I, Robot", "author": "Isaac Asimov" });
+                docs.push(doc! { "title": "Foundation", "author": "Isaac Asimov" });
+                docs.push(doc! { "title": "Brave New World", "author": "Aldous Huxley" });
             }
         
             for _ in 0..6250 {
@@ -60,18 +59,10 @@ fn main() {
     println!("Time spent in insert: {:?}", duration);
 
     // Now let's fetch all collection's data
-
-    let client = Client::with_uri_str(uri).unwrap();
-    let database = client.database("test");
-    let collection = database.collection("pollo");
-
     let start = Instant::now();
 
-    //let args: Vec<String> = env::args().collect();
-    //let batch_size:u32 = args[1].parse().unwrap();
-
     // Query the documents in the collection with a filter and an option.
-    let filter = doc! { "author": "George Orwell" };
+    let filter = doc! { "author": "Isaac Asimov" };
     let find_options = FindOptions::builder()
         .batch_size(BATCH_SIZE)
         .build();

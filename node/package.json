@@ -2,7 +2,7 @@
   "name": "mongobenchmark",
   "version": "1.0.0",
   "description": "Testing Mongo driver for Node",
-  "main": "mongo_insert.js",
+  "main": "mongobenchmark.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },

@@ -22,11 +22,12 @@ func main() {
 	start := time.Now()
 
 	client, _ := mongo.Connect(context.Background(), options.Client().ApplyURI("mongodb://localhost:27017"))
-	collection := client.Database("test").Collection("pato")
+	collection := client.Database("test").Collection("go")
 
 	// Drop collection to start from scratch
 	collection.Drop(context.Background())
 
+	// Insert documents using 8 goroutines
 	var wg sync.WaitGroup
 
 	for i := 0; i < 8; i++ {
@@ -44,15 +45,13 @@ func main() {
 	start = time.Now()
 
 	batch_size := int32(1000)
-	cursor, err := collection.Find(context.Background(), bson.M{"author": "George Orwell"}, &options.FindOptions{BatchSize: &batch_size})
+	cursor, err := collection.Find(context.Background(), bson.M{"author": "Isaac Asimov"}, &options.FindOptions{BatchSize: &batch_size})
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	documents_found := 0
 	defer cursor.Close(context.Background())
 	for cursor.Next(context.Background()) {
-		documents_found++
 		var document bson.M
 		if err = cursor.Decode(&document); err != nil {
 			log.Fatal(err)
@@ -63,15 +62,13 @@ func main() {
 	}
 
 	elapsed = time.Since(start)
-	fmt.Printf("Find %d documents took %s", documents_found, elapsed)
+	fmt.Printf("Find documents took %s", elapsed)
 
 }
 
 func insertMany(wg *sync.WaitGroup) {
 
 	defer wg.Done()
-
-	fmt.Println("Starting goroutine")
 
 	client, err := mongo.Connect(context.Background(), options.Client().ApplyURI("mongodb://localhost:27017"))
 
@@ -81,36 +78,37 @@ func insertMany(wg *sync.WaitGroup) {
 		}
 	}()
 
-	collection := client.Database("test").Collection("pato")
-
-	insertedDocs := 0
+	collection := client.Database("test").Collection("go")
 
 	for i := 0; i < 6250; i++ {
-		_1984 := Book{
-			Title:  "1984",
-			Author: "George Orwell",
+		dune := Book{
+			Title:  "Dune",
+			Author: "Frank Herbert",
 		}
-		animalfarm := Book{
-			Title:  "Animal Farm",
-			Author: "George Orwell",
+		i_robot := Book{
+			Title:  "I, Robot",
+			Author: "Isaac Asimov",
 		}
-		greatgatsby := Book{
-			Title:  "The Great Gatsby",
-			Author: "F. Scott Fitzgerald",
+		foundation := Book{
+			Title:  "Foundation",
+			Author: "Isaac Asimov",
+		}
+		brave_new_world := Book{
+			Title:  "Brave New World",
+			Author: "Aldous Huxley",
 		}
 
-		books := []interface{}{_1984}
+		books := []interface{}{dune}
 
 		for j := 0; j < 33; j++ {
-			books = append(books, _1984, animalfarm, greatgatsby)
+			books = append(books, i_robot, foundation, brave_new_world)
 		}
 
-		res, err := collection.InsertMany(context.Background(), books)
+		_, err := collection.InsertMany(context.Background(), books)
 
 		if err != nil {
 			log.Fatal(err)
 		}
-		insertedDocs += len(res.InsertedIDs)
 
 	}
 

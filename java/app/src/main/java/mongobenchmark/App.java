@@ -18,18 +18,17 @@ public class App {
     public static void main(String[] args) throws InterruptedException {
 
         MongoClient mongoClient = new MongoClient("localhost", 27017);
-        MongoCollection collection = mongoClient.getDatabase("test").getCollection("cerdo");
+        MongoCollection collection = mongoClient.getDatabase("test").getCollection("java");
         collection.drop();
 
         Instant start = Instant.now();
 
         List<Thread> threads = new ArrayList<>();
         for(int i=0; i<8; i++){
-            System.out.println("Creating thread " + i);
             Thread thread = new Thread(() -> {
                 MongoClient mongoThreadClient = new MongoClient("localhost", 27017);
 
-                MongoCollection threadCollection = mongoThreadClient.getDatabase("test").getCollection("cerdo");
+                MongoCollection threadCollection = mongoThreadClient.getDatabase("test").getCollection("java");
 
                 for(int j=0; j<6250; j++){
                     threadCollection.insertMany(createDocuments());
@@ -47,10 +46,15 @@ public class App {
         System.out.println("Insert took " + Duration.between(start, Instant.now()).toSeconds() + " seconds");
 
         start = Instant.now();
-        // Now fetch all inserted documents
-        MongoCursor<Document> cursor = collection.find().batchSize(1000).iterator();
+        // Now find and fetch a subset of the inserted documents
+        Document document = new Document();
+        document.put("author", "Isaac Asimov");
+
+        MongoCursor<Document> cursor = collection.find(document).batchSize(1000).iterator();
+        int docs = 0;
         try {
             while (cursor.hasNext()) {
+                docs++;
                 Document doc = cursor.next();
                 String title = doc.getString("title");
                 String author = doc.getString("author");
@@ -66,24 +70,24 @@ public class App {
         List<Document> docs = new ArrayList<>();
 
         Document document = new Document();
-        document.put("title", "1984");
-        document.put("author", "George Orwell");
+        document.put("title", "Dune");
+        document.put("author", "Frank Herbert");
         docs.add(document);
 
         for(int i=0; i<33; i++) {
             document = new Document();
-            document.put("title", "1984");
-            document.put("author", "George Orwell");
+            document.put("title", "I, Robot");
+            document.put("author", "Isaac Asimov");
             docs.add(document);
 
             document = new Document();
-            document.put("title", "Animal Farm");
-            document.put("author", "George Orwell");
+            document.put("title", "Foundation");
+            document.put("author", "Isaac Asimov");
             docs.add(document);
 
             document = new Document();
-            document.put("title", "The Great Gatsby");
-            document.put("author", "F. Scott Fitzgerald");
+            document.put("title", "Brave New World");
+            document.put("author", "Aldous Huxley");
             docs.add(document);
         }
 
