@@ -80,29 +80,30 @@ func insertMany(wg *sync.WaitGroup) {
 
 	collection := client.Database("test").Collection("go")
 
+	dune := Book{
+		Title:  "Dune",
+		Author: "Frank Herbert",
+	}
+	i_robot := Book{
+		Title:  "I, Robot",
+		Author: "Isaac Asimov",
+	}
+	foundation := Book{
+		Title:  "Foundation",
+		Author: "Isaac Asimov",
+	}
+	brave_new_world := Book{
+		Title:  "Brave New World",
+		Author: "Aldous Huxley",
+	}
+
+	books := []interface{}{dune}
+
+	for j := 0; j < 33; j++ {
+		books = append(books, i_robot, foundation, brave_new_world)
+	}
+
 	for i := 0; i < 6250; i++ {
-		dune := Book{
-			Title:  "Dune",
-			Author: "Frank Herbert",
-		}
-		i_robot := Book{
-			Title:  "I, Robot",
-			Author: "Isaac Asimov",
-		}
-		foundation := Book{
-			Title:  "Foundation",
-			Author: "Isaac Asimov",
-		}
-		brave_new_world := Book{
-			Title:  "Brave New World",
-			Author: "Aldous Huxley",
-		}
-
-		books := []interface{}{dune}
-
-		for j := 0; j < 33; j++ {
-			books = append(books, i_robot, foundation, brave_new_world)
-		}
 
 		_, err := collection.InsertMany(context.Background(), books)
 

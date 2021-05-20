@@ -1,4 +1,4 @@
-import pymongo, threading, time
+import pymongo, threading, time, copy
 
 def worker(count):
     myclient = pymongo.MongoClient("mongodb://localhost:27017/")
@@ -12,7 +12,7 @@ def worker(count):
         docs.append({ "title": "Brave New World", "author": "Aldous Huxley" })
 
     for i in range(6250):
-        mycol.insert_many(docs)
+        mycol.insert_many(copy.deepcopy(docs))
         
     return
 

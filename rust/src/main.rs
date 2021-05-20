@@ -6,7 +6,6 @@ use mongodb::{
 
 use std::thread;
 use std::time::{Instant};
-//use std::env;
 
 const BATCH_SIZE:u32 = 1000;
 const DB_NAME:&str = "test";
@@ -27,20 +26,20 @@ fn main() {
     let mut threads = vec!();
     for _ in 0..8 {
 
+        let mut docs = vec![
+            doc! { "title": "Dune", "author": "Frank Herbert" },
+        ];
+
+        for _ in 0..33 {
+            docs.push(doc! { "title": "I, Robot", "author": "Isaac Asimov" });
+            docs.push(doc! { "title": "Foundation", "author": "Isaac Asimov" });
+            docs.push(doc! { "title": "Brave New World", "author": "Aldous Huxley" });
+        }
+
         threads.push(thread::spawn(move || {
             let client = Client::with_uri_str(uri).unwrap();
             let database = client.database(DB_NAME);
             let collection = database.collection(COLLECTION_NAME);
-
-            let mut docs = vec![
-                doc! { "title": "Dune", "author": "Frank Herbert" },
-            ];
-
-            for _ in 0..33 {
-                docs.push(doc! { "title": "I, Robot", "author": "Isaac Asimov" });
-                docs.push(doc! { "title": "Foundation", "author": "Isaac Asimov" });
-                docs.push(doc! { "title": "Brave New World", "author": "Aldous Huxley" });
-            }
         
             for _ in 0..6250 {
                 collection.insert_many(docs.clone(), None).unwrap();
@@ -68,20 +67,17 @@ fn main() {
         .build();
     let cursor = collection.find(filter, find_options).unwrap();
 
-    let mut processed_docs = 0;
-
     // Iterate over the results of the cursor.
     for result in cursor {
         match result {
             Ok(document) => {
                 let _title = document.get("title").and_then(Bson::as_str);
                 let _author = document.get("author").and_then(Bson::as_str);
-                processed_docs = processed_docs + 1;
             }
             Err(e) => println!("{:?}", e),
         } 
     }
 
     let duration = start.elapsed();
-    println!("Time spent in processing {} documents: {:?}", processed_docs, duration);
+    println!("Time spent in finding documents: {:?}", duration);
 }
