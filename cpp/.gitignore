@@ -1,4 +1,5 @@
 mongobenchmark
 mongo-c-driver/
 mongo-cxx-driver-r3.4.2/
-cpp/.vscode
+cpp/.vscode/
+.vscode/

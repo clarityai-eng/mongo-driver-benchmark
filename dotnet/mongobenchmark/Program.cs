@@ -1,4 +1,6 @@
-﻿using System.Threading;
+﻿using System;
+using System.Threading;
+using System.Diagnostics;
 using System.Collections.Generic;
 using MongoDB.Bson;
 using MongoDB.Driver;
@@ -13,18 +15,20 @@ namespace mongobenchmark
             var database = client.GetDatabase("test");
             var collection = database.GetCollection<BsonDocument>("dotnet");
 
+            // Create a list of 100 documents
+            var docList = new List<BsonDocument>();
+            docList.Add(new BsonDocument{{ "title", "Dune" },{ "author", "Frank Herbert" }});
+
+            for (int j = 0; j < 33; j++) {
+                docList.Add(new BsonDocument{{ "title", "I, Robot" },{ "author", "Isaac Asimov" }});
+                docList.Add(new BsonDocument{{ "title", "Foundation" },{ "author", "Isaac Asimov" }});
+                docList.Add(new BsonDocument{{ "title", "Brave New World" },{ "author", "Aldous Huxley" }});
+            }
+
             for (int i = 0; i < 6250; i++) {
-                // Create a list of 100 documents
-                var docList = new List<BsonDocument>();
-                docList.Add(new BsonDocument{{ "title", "Dune" },{ "author", "Frank Herbert" }});
-
-                for (int j = 0; j < 33; j++) {
-                    docList.Add(new BsonDocument{{ "title", "I, Robot" },{ "author", "Isaac Asimov" }});
-                    docList.Add(new BsonDocument{{ "title", "Foundation" },{ "author", "Isaac Asimov" }});
-                    docList.Add(new BsonDocument{{ "title", "Brave New World" },{ "author", "Aldous Huxley" }});
-                }
-
-              collection.InsertMany(docList);
+              // Clone list to avoid duplicated ids 
+              List<BsonDocument> cloned_list = docList.ConvertAll(book => new BsonDocument(book));
+              collection.InsertMany(cloned_list);
             }
         }
     }
@@ -33,6 +37,9 @@ namespace mongobenchmark
     {
         static void Main(string[] args)
         {
+            Stopwatch stopWatch = new Stopwatch();
+            stopWatch.Start();
+
             var client = new MongoClient("mongodb://localhost:27017");
             var database = client.GetDatabase("test");
             var collection = database.GetCollection<BsonDocument>("dotnet");
@@ -49,6 +56,9 @@ namespace mongobenchmark
             foreach(Thread thread in threads) {
                 thread.Join();
             }
+
+            stopWatch.Stop();
+            Console.WriteLine("Insert time " + stopWatch.ElapsedMilliseconds);
 
             // Query documents
             var options = new FindOptions<BsonDocument> { BatchSize = 1000 };

@@ -5,14 +5,13 @@ def worker(count):
     mydb = myclient["test"]
     mycol = mydb["python"]
 
+    docs = [{ "title": "Dune", "author": "Frank Herbert" }]
+    for j in range(33):
+        docs.append({ "title": "I, Robot", "author": "Isaac Asimov" })
+        docs.append({ "title": "Foundation", "author": "Isaac Asimov" })
+        docs.append({ "title": "Brave New World", "author": "Aldous Huxley" })
+
     for i in range(6250):
-
-        docs = [{ "title": "Dune", "author": "Frank Herbert" }]
-        for j in range(33):
-            docs.append({ "title": "I, Robot", "author": "Isaac Asimov" })
-            docs.append({ "title": "Foundation", "author": "Isaac Asimov" })
-            docs.append({ "title": "Brave New World", "author": "Aldous Huxley" })
-
         mycol.insert_many(docs)
         
     return
