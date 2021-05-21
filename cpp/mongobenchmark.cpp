@@ -54,7 +54,7 @@ int main(int argc, char const *argv[])
 	mongocxx::options::find options;
     options.batch_size(1000);
 
-	// Let's now fetch now all documents sequentially
+	// Let's now fetch all documents sequentially
 	mongocxx::cursor cursor = collection.find(
 		document{} << "author" << "Isaac Asimov" 
 			<< bsoncxx::builder::stream::finalize, options);

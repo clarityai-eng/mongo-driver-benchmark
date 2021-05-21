@@ -51,10 +51,9 @@ public class App {
         document.put("author", "Isaac Asimov");
 
         MongoCursor<Document> cursor = collection.find(document).batchSize(1000).iterator();
-        int docs = 0;
+
         try {
             while (cursor.hasNext()) {
-                docs++;
                 Document doc = cursor.next();
                 String title = doc.getString("title");
                 String author = doc.getString("author");

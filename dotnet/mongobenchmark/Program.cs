@@ -44,6 +44,8 @@ namespace mongobenchmark
             var database = client.GetDatabase("test");
             var collection = database.GetCollection<BsonDocument>("dotnet");
 
+            database.DropCollection("dotnet");
+
             // Create and start all worker threads 
             var threads = new List<Thread>();
             for(int i=0; i<8; i++){
@@ -60,15 +62,19 @@ namespace mongobenchmark
             stopWatch.Stop();
             Console.WriteLine("Insert time " + stopWatch.ElapsedMilliseconds);
 
+            stopWatch.Start();
             // Query documents
-            var options = new FindOptions<BsonDocument> { BatchSize = 1000 };
+            var options = new FindOptions { BatchSize = 1000 };
             var filter = Builders<BsonDocument>.Filter.Eq("author", "Isaac Asimov");
-            var cursor = collection.Find(filter).ToCursor();
+            var cursor = collection.Find(filter, options).ToCursor();
             foreach (var document in cursor.ToEnumerable())
             {
                 var title = document.GetValue("title").ToString();
                 var author = document.GetValue("author").ToString();   
             }
+
+            stopWatch.Stop();
+            Console.WriteLine("Find time " + stopWatch.ElapsedMilliseconds);
         }
     }
 }

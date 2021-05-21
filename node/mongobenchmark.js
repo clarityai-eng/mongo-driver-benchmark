@@ -25,7 +25,7 @@ async function run() {
       docs.push({ "title": "Brave New World", "author": "Aldous Huxley" });
     }
 
-    // Insert all documents, doing batches of 8 concurrent calls to the client 
+    // Insert all documents, doing batches of 8 concurrent async calls to the same client 
     for (i=0; i<6250; i++) {
 
       let insert_promises = [];
