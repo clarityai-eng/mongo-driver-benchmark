@@ -35,15 +35,19 @@ for t in threads:
     t.join()
 
 end = time.time()
-print(end - start)
+print(u'Insert time: ', end - start)
 
 # Now read all docs sequentially
 
+totalChars = 0
 start = time.time()
 cursor = mycol.find({ "author": "Isaac Asimov" }, batch_size=1000)
 for doc in cursor:
     title = doc["title"]
-    author = doc["author"]   
+    author = doc["author"]
+    totalChars += len(title) + len(author)
+
+print(u'Total chars: ', totalChars)
 
 end = time.time()
-print(end - start)
+print(u'Fetch time: ', end - start)

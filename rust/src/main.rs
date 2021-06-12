@@ -55,7 +55,7 @@ fn main() {
 
     let duration = start.elapsed();
 
-    println!("Time spent in insert: {:?}", duration);
+    println!("Insert time: {:?}", duration);
 
     // Now let's fetch all collection's data
     let start = Instant::now();
@@ -67,17 +67,21 @@ fn main() {
         .build();
     let cursor = collection.find(filter, find_options).unwrap();
 
+    let mut total_chars = 0;
     // Iterate over the results of the cursor.
     for result in cursor {
         match result {
             Ok(document) => {
-                let _title = document.get("title").and_then(Bson::as_str);
-                let _author = document.get("author").and_then(Bson::as_str);
+                let title = document.get("title").and_then(Bson::as_str).unwrap();
+                let author = document.get("author").and_then(Bson::as_str).unwrap();
+                total_chars = total_chars + title.len() + author.len();
             }
             Err(e) => println!("{:?}", e),
         } 
     }
 
+    println!("Total chars: {:?}", total_chars);
+
     let duration = start.elapsed();
-    println!("Time spent in finding documents: {:?}", duration);
+    println!("Fetch time: {:?}", duration);
 }

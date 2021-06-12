@@ -67,11 +67,15 @@ namespace mongobenchmark
             var options = new FindOptions { BatchSize = 1000 };
             var filter = Builders<BsonDocument>.Filter.Eq("author", "Isaac Asimov");
             var cursor = collection.Find(filter, options).ToCursor();
+            var totalChars = 0;
             foreach (var document in cursor.ToEnumerable())
             {
                 var title = document.GetValue("title").ToString();
-                var author = document.GetValue("author").ToString();   
+                var author = document.GetValue("author").ToString();
+                totalChars += title.Length + author.Length;   
             }
+
+            Console.WriteLine("Total Chars " + totalChars);
 
             stopWatch.Stop();
             Console.WriteLine("Find time " + stopWatch.ElapsedMilliseconds);

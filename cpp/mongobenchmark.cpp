@@ -50,6 +50,7 @@ int main(int argc, char const *argv[])
 	std::chrono::steady_clock::time_point end = std::chrono::steady_clock::now();
 	std::cout << "Insert time = " << std::chrono::duration_cast<std::chrono::milliseconds>(end - begin).count() << " ms" << std::endl;
 
+	begin = std::chrono::steady_clock::now();
 	// Find from inserted docs
 	mongocxx::options::find options;
     options.batch_size(1000);
@@ -59,10 +60,18 @@ int main(int argc, char const *argv[])
 		document{} << "author" << "Isaac Asimov" 
 			<< bsoncxx::builder::stream::finalize, options);
 	
+	long allChars = 0;
 	for(auto doc : cursor) {
 		std::string title = doc["title"].get_utf8().value.to_string();
 		std::string author = doc["author"].get_utf8().value.to_string();
+
+		allChars = allChars + title.length() + author.length();
 	}
+
+	std::cout << "Total Chars: " << allChars << std::endl;
+
+	end = std::chrono::steady_clock::now();
+	std::cout << "Fetch time = " << std::chrono::duration_cast<std::chrono::milliseconds>(end - begin).count() << " ms" << std::endl;
 
 	return 0;
 }
@@ -107,6 +116,7 @@ void worker_thread() {
 
 	// Insert books in batches of 100
 	for(int i=0; i < 6250; i++) {
-		collection.insert_many(documents);
+		std::vector<bsoncxx::document::value> cloned_documents = documents;
+		collection.insert_many(cloned_documents);
 	}
 }

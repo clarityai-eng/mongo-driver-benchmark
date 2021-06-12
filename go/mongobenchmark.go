@@ -50,6 +50,7 @@ func main() {
 		log.Fatal(err)
 	}
 
+	var totalChars = 0
 	defer cursor.Close(context.Background())
 	for cursor.Next(context.Background()) {
 		var document bson.M
@@ -57,13 +58,16 @@ func main() {
 			log.Fatal(err)
 		}
 
-		var _ = document["title"]
-		var _ = document["author"]
+		var title = document["title"].(string)
+		var author = document["author"].(string)
+
+		totalChars += len(title) + len(author)
 	}
+
+	fmt.Printf("Total chars %d", totalChars)
 
 	elapsed = time.Since(start)
 	fmt.Printf("Find documents took %s", elapsed)
-
 }
 
 func insertMany(wg *sync.WaitGroup) {
@@ -104,8 +108,10 @@ func insertMany(wg *sync.WaitGroup) {
 	}
 
 	for i := 0; i < 6250; i++ {
+		cloned_books := make([]interface{}, len(books))
+		copy(cloned_books, books)
 
-		_, err := collection.InsertMany(context.Background(), books)
+		_, err := collection.InsertMany(context.Background(), cloned_books)
 
 		if err != nil {
 			log.Fatal(err)

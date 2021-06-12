@@ -43,7 +43,7 @@ public class App {
             thread.join();
         }
 
-        System.out.println("Insert took " + Duration.between(start, Instant.now()).toSeconds() + " seconds");
+        System.out.println("Insert time " + Duration.between(start, Instant.now()).toSeconds() + " seconds");
 
         start = Instant.now();
         // Now find and fetch a subset of the inserted documents
@@ -52,17 +52,21 @@ public class App {
 
         MongoCursor<Document> cursor = collection.find(document).batchSize(1000).iterator();
 
+        int totalChars = 0;
         try {
             while (cursor.hasNext()) {
                 Document doc = cursor.next();
                 String title = doc.getString("title");
                 String author = doc.getString("author");
+                totalChars += title.length() + author.length();
             }
+
+            System.out.println("Total chars: " + totalChars);
         } finally {
             cursor.close();
         }
 
-        System.out.println("Find took " + Duration.between(start, Instant.now()).toSeconds() + " seconds");
+        System.out.println("Fetch time " + Duration.between(start, Instant.now()).toSeconds() + " seconds");
     }
 
     private static List<Document> createDocuments() {
