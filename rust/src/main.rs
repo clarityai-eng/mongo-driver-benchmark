@@ -6,10 +6,18 @@ use mongodb::{
 
 use std::thread;
 use std::time::{Instant};
+use serde::{Deserialize, Serialize};
 
 const BATCH_SIZE:u32 = 1000;
 const DB_NAME:&str = "test";
 const COLLECTION_NAME:&str = "rust";
+
+
+#[derive(Debug, Serialize, Deserialize)]
+struct Book {
+    title: String,
+    author: String,
+}
 
 fn main() {
     let uri = "mongodb://localhost:27017";
@@ -19,7 +27,7 @@ fn main() {
 
     let client = Client::with_uri_str(uri).unwrap();
     let database = client.database(DB_NAME);
-    let collection = database.collection(COLLECTION_NAME);
+    let collection = database.collection::<Book>(COLLECTION_NAME);
 
     collection.drop(None).unwrap();
 
@@ -70,14 +78,10 @@ fn main() {
     let mut total_chars = 0;
     // Iterate over the results of the cursor.
     for result in cursor {
-        match result {
-            Ok(document) => {
-                let title = document.get("title").and_then(Bson::as_str).unwrap();
-                let author = document.get("author").and_then(Bson::as_str).unwrap();
-                total_chars = total_chars + title.len() + author.len();
-            }
-            Err(e) => println!("{:?}", e),
-        } 
+        let book = result.unwrap();
+        let title = book.title;
+        let author = book.author;
+        total_chars = total_chars + title.len() + author.len(); 
     }
 
     println!("Total chars: {:?}", total_chars);

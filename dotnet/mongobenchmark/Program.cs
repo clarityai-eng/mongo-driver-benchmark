@@ -62,7 +62,7 @@ namespace mongobenchmark
             stopWatch.Stop();
             Console.WriteLine("Insert time " + stopWatch.ElapsedMilliseconds);
 
-            stopWatch.Start();
+            stopWatch.Restart();
             // Query documents
             var options = new FindOptions { BatchSize = 1000 };
             var filter = Builders<BsonDocument>.Filter.Eq("author", "Isaac Asimov");
