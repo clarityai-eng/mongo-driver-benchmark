@@ -2,4 +2,4 @@
 
 The purpose of this repo is to store the code for the following Medium article:
 
-URL To Be Defined
+https://medium.com/clarityai-engineering/mongodb-driver-performance-in-several-languages-888899494b88
