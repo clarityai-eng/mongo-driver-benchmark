@@ -9,6 +9,7 @@
 plugins {
     // Apply the application plugin to add support for building a CLI application in Java.
     id 'application'
+    id 'java'
 }
 
 repositories {
@@ -32,6 +33,16 @@ application {
     // Define the main class for the application.
     mainClass = 'mongobenchmark.App'
     applicationDefaultJvmArgs = ['-Xmx16m']
+}
+
+jar {
+    manifest {
+        attributes "Main-Class": "mongobenchmark.App"
+    }
+
+    from {
+        configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) }
+    }
 }
 
 tasks.named('test') {
